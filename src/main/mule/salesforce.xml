@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="52143f87-bef9-4065-8e16-f90a63be999f" >
+		<http:listener-connection host="0.0.0.0" port="8063" />
+	</http:listener-config>
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="55ed20c9-5587-4893-a19a-062521687f04" >
+		<salesforce:basic-connection username="mounica09@infosys.com" password="bluefisH@04" securityToken="5Combam2ciqHTlhQt7Cu8VBB" />
+	</salesforce:sfdc-config>
+	<flow name="salesforceFlow" doc:id="951f6542-e366-43c3-a26e-8fdf303365c4" >
+		<http:listener doc:name="Listener" doc:id="0e9379f7-6cd2-4532-8120-728653c511e9" config-ref="HTTP_Listener_config" path="sf"/>
+		<ee:transform doc:name="Transform Message" doc:id="331477f1-a06b-4e20-91b7-eababc051c7b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	LastName: payload01.name,
+	Email: payload01.email
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:create doc:name="Create" doc:id="4fad90e6-fd79-48fc-8801-919bd6b12e48" config-ref="Salesforce_Config" type="Contact"/>
+		<logger level="INFO" doc:name="Logger" doc:id="aabaecd5-8bc9-430d-a9b4-dcbf22f8b143" message="#[payload]"/>
+	</flow>
+</mule>
